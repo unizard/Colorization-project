@@ -98,6 +98,7 @@ for im_id = 1 : numel(names)
     min_layer_id = dist_record(final_order(1)).layer;
     min_kc_id = dist_record(final_order(1)).kc;
     subnet = net(min_layer_id).net_data(min_kc_id).nn;
+    %subnet = net(1).net_data(1).nn;
     
    %% colorize 
     fprintf('Using NN of ----- Layer #%d -- Cluster #%d \n', min_layer_id, min_kc_id);

@@ -1,8 +1,7 @@
 %% set parameters
 disp('Load model (colorization model && scene parsing model) ... ')
 addpath(genpath('.'));
-%caffe_root = '../caffe-future';
-caffe_root = '../caffe';
+caffe_root = '../';
 addpath(genpath(caffe_root));
 if ~exist('net', 'var')
     load('colorization_model/NETWORK_TIP_V1.mat')
@@ -15,6 +14,7 @@ daisyNum = 32;
 
 %% read a target image
 test_image = imread('test.jpg');
+%test_image = imread('examples/image/sun_axmhoupmaonizbqo.jpg');
 if size(test_image, 3) == 3
     test_gray = rgb2gray(test_image);
 else
@@ -43,7 +43,7 @@ mean_data(:, :, 1) = 104.00698793 * ones(width, height);
 mean_data(:, :, 2) = 116.66876762 * ones(width, height);
 mean_data(:, :, 3) = 116.66876762 * ones(width, height);
 im_data = im_data - mean_data;
-im_data = permute(im_data, [2,1,3]);
+im_data = permute(im_data, [2,1,3]); % Transpose
 im_data = single(im_data);
 stc_net.blobs('data').reshape([height width 3 1]);
 stc_net.reshape();
@@ -54,6 +54,7 @@ test_stclabel.result = permute(prob, [3, 2, 1]); % stc_channels first
 %% generate daisy feature
 disp('Generate Daisy feature')
 dzy = compute_daisy(test_gray,7,1,3,8);
+
 %% compute gist and find nearest cluster center
 disp('Find nearest image cluster ... ')
 % set params of gist
@@ -67,7 +68,7 @@ param.fc_prefilt = 4;
 nbins = 33;
 [~, stc_label_tmp] = max(test_stclabel.result, [], 1);
 stc_label_tmp = stc_label_tmp - 1;
-stc_hist_test = hist(reshape(stc_label_tmp, [numel(stc_label_tmp), 1]), [1:nbins]);
+stc_hist_test = hist(reshape(stc_label_tmp, [numel(stc_label_tmp), 1]), 1:nbins);
 stc_hist_test = stc_hist_test ./ sum(stc_hist_test);
 
 % gist distance and stc histogram similarity
